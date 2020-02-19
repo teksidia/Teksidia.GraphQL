@@ -1,0 +1,48 @@
+@{
+    ViewData["Title"] = "Home Page";
+}
+@model GraphQLApi.Controllers.TokenRequestModel
+
+
+  <div class="col-md-8 offset-md-2">
+    <h1 class="display-4">CDM API (GraphQL)</h1>
+    <p>This API requires authentication. For more information consult the <a asp-controller="Home" asp-action="Documentation">Documentation</a>.</p>
+    <form asp-action="Index" asp-controller="Home">
+      <div class="form-group">
+        <label for="clientId">Client Identifier (GUID)</label>
+        <input type="text" class="form-control" id="clientId" name="clientId" aria-describedby="client id">
+        <small id="clientIdHelp" class="form-text text-muted">App Registration Id for a registered client app</small>
+      </div>
+      <div class="form-group">
+        <label for="secret">Secret</label>
+        <input type="text" class="form-control" id="secret" name="secret" aria-describedby="secret">
+        <small id="help" class="form-text text-muted">App Registration secret for a registered client app</small>
+      </div>
+      <button type="submit" class="btn btn-primary">Get Auth Token</button>
+    </form>
+
+    @if (Model != null)
+    {
+      if (Model.Text == "INVALID CREDENTIALS")
+      {
+        <div style="margin-top: 20px">
+          <div class="alert alert-danger" role="alert" style="margin-top: 20px">
+            Invalid credentials. Please check client id and secret are correct.
+          </div>
+        </div>
+      }
+      else
+      {
+        <div style="margin-top: 20px">
+          <div class="alert alert-secondary" role="alert" style="margin-top: 20px">
+            <pre>@Model?.Text.Trim()</pre>
+          </div>
+          <p>Copy the above text into the HTTP HEADERS section of the playground.</p>
+        </div>
+
+        <a href="/ui/playground" class="btn btn-success">Go to Playground</a>
+      }
+
+    }
+
+  </div>
