@@ -7,13 +7,17 @@
 
   <ItemGroup>
     <None Remove="DataQueryTemplate.txt" />
-    <None Remove="EntityTypeChildTemplate.txt" />
     <None Remove="EntityTypeTemplate.txt" />
+    <None Remove="OneToManyMappingTemplate.txt" />
+    <None Remove="OneToOneMappingTemplate.txt" />
     <None Remove="StartupServicesTemplate.txt" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="EntityTypeChildTemplate.txt">
+    <Content Include="OneToManyMappingTemplate.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="OneToOneMappingTemplate.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="StartupServicesTemplate.txt">

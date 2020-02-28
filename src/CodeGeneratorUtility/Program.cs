@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -11,18 +12,20 @@ namespace CodeGeneratorUtility
     class Program
     {
         public static string EntityTypeTemplate { get; set; }
-        public static string EntityTypeChildTemplate { get; set; }
         public static string DataQueryTemplate { get; set; }
         public static string StartupServicesTemplate { get; set; }
+        public static string OneToOneMappingTemplate { get; set; }
+        public static string OneToManyMappingTemplate { get; set; }
 
         public static string TargetLocation { get; set; }
 
         static void Main(string[] args)
         {
             EntityTypeTemplate = File.ReadAllText(Path.Join(Environment.CurrentDirectory, "EntityTypeTemplate.txt"));
-            EntityTypeChildTemplate = File.ReadAllText(Path.Join(Environment.CurrentDirectory, "EntityTypeChildTemplate.txt"));
             DataQueryTemplate = File.ReadAllText(Path.Join(Environment.CurrentDirectory, "DataQueryTemplate.txt"));
             StartupServicesTemplate = File.ReadAllText(Path.Join(Environment.CurrentDirectory, "StartupServicesTemplate.txt"));
+            OneToOneMappingTemplate = File.ReadAllText(Path.Join(Environment.CurrentDirectory, "OneToOneMappingTemplate.txt"));
+            OneToManyMappingTemplate = File.ReadAllText(Path.Join(Environment.CurrentDirectory, "OneToManyMappingTemplate.txt"));
 
             TargetLocation = GetGeneratedCodeTargetLocation();
 
@@ -38,8 +41,9 @@ namespace CodeGeneratorUtility
                 {
                    CreateGraphQLType(modelType);
 
-                   var query = "            InitQuery<{0}Type, {0}>();\n";
-                   var completedQuery = string.Format(query, modelType.Name);
+                   var tableName = modelType.Name;
+                   var query = "            InitQuery<{0}Type, {0}>(\"{1}\");\n";
+                   var completedQuery = string.Format(query, modelType.Name, tableName);
                    queries.AppendLine(completedQuery);
 
                    var init = "             services.AddSingleton<{0}Type>();\n";
@@ -81,31 +85,66 @@ namespace CodeGeneratorUtility
 
             foreach (var prop in propertyInfos)
             {
-                var field = "            Field(h => h.{0}{1}).Description(\"{0}\");\r\n";
-                var nullsAllowed =
-                    AllowNullables(prop.PropertyType, prop.GetCustomAttributes<KeyAttribute>().Any());
-                var completedField = string.Format(field, prop.Name, nullsAllowed ? ", true" : "");
-                fields.AppendLine(completedField);
+                var isChildField = Attribute.IsDefined(prop, typeof(ChildAttribute));
+                var isEnumerable = typeof(IEnumerable<object>).IsAssignableFrom(prop.PropertyType);
+
+                if (isChildField && isEnumerable)
+                {
+                    var field = CreateChildField(OneToManyMappingTemplate, modelType.Name, prop, isEnumerable);
+                    fields.AppendLine(field);
+                }
+
+                if (isChildField && !isEnumerable)
+                {
+                    var field = CreateChildField(OneToOneMappingTemplate, modelType.Name, prop, isEnumerable);
+                    fields.AppendLine(field);
+                }
+
+                if (!isChildField)
+                {
+                    var field = CreateScalarField(prop);
+                    fields.AppendLine(field);
+                }
             }
 
             var mainClassGeneratedCode = string.Format(EntityTypeTemplate, modelType.Name, fields);
-
-            // create main query fields
-
             var fileName = $"{modelType.Name}Type.cs";
             File.WriteAllText($"{TargetLocation}\\Types\\{fileName}", mainClassGeneratedCode);
             Console.WriteLine($"Created GraphQL type {fileName}");
+        }
 
-            // create partial classes for custom fields (e.g. children of main entity)
+        private static string CreateScalarField(PropertyInfo prop)
+        {
+            const string field = "            Field(h => h.{0}{1}).Description(\"{0}\");\r\n";
+            var nullsAllowed =
+                AllowNullables(prop.PropertyType, prop.GetCustomAttributes<KeyAttribute>().Any());
+            return string.Format(field, prop.Name, nullsAllowed ? ", true" : "");
+        }
 
-            var childFieldsFileName = $"{modelType.Name}Type.Children.cs";
-            if (!File.Exists($"{TargetLocation}\\Types\\{childFieldsFileName}"))
+        private static string CreateChildField(string template, string parentEntity, PropertyInfo prop, bool isEnumerable)
+        {
+            var propertyType = isEnumerable ? prop.PropertyType.GetGenericArguments()[0] : prop.PropertyType;
+
+            var childEntity = propertyType.Name;
+            var relationship = prop.GetCustomAttribute<ChildAttribute>();
+
+            var joinCollection = new List<Tuple<string, string>>
             {
-                var childClassGeneratedCode = string.Format(EntityTypeChildTemplate, modelType.Name);
-                File.WriteAllText($"{TargetLocation}\\Types\\{childFieldsFileName}", childClassGeneratedCode);
-                Console.WriteLine($"Created GraphQL type partial for custom fields {fileName}");
-            }
+                new Tuple<string, string>(relationship.LocalProperty, relationship.ForeignProperty),
+                new Tuple<string, string>(relationship.LocalProperty2, relationship.ForeignProperty2),
+                new Tuple<string, string>(relationship.LocalProperty3, relationship.ForeignProperty3),
+                new Tuple<string, string>(relationship.LocalProperty4, relationship.ForeignProperty4),
+                new Tuple<string, string>(relationship.LocalProperty5, relationship.ForeignProperty5)
+            };
 
+            var parentJoinCollection = joinCollection.Where(_ => !string.IsNullOrEmpty(_.Item1)).Select(_ => string.Format("{{\"{0}\", context.Source.{1}}}", _.Item2, _.Item1));
+            var childJoinCollection = joinCollection.Where(_ => !string.IsNullOrEmpty(_.Item2)).Select(_ => string.Format("{{\"{0}\", r.{0}}}", _.Item2));
+
+            var parentJoins = string.Join(", ", parentJoinCollection);
+            var childJoins = string.Join(", ", childJoinCollection);
+
+            var field = string.Format(template, propertyType.Name, prop.Name.ToLowerInvariant(), childEntity, parentEntity, parentJoins, childJoins);
+            return field;
         }
 
         internal static bool AllowNullables(Type type, bool isPrimaryKey)

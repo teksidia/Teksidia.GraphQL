@@ -5,6 +5,7 @@ using GraphQL;
 using GraphQL.Types;
 using GraphQLApi.Models;
 using SqlKata;
+using SqlKata.Compilers;
 using SqlKata.Execution;
 
 namespace GraphQLApi.GraphQL

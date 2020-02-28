@@ -72,18 +72,18 @@ namespace GraphQLApi.GraphQL
                 _.EnableMetrics = _settings.EnableMetrics;
                 _.ExposeExceptions = _settings.ExposeExceptions;
                 _.ComplexityConfiguration = new ComplexityConfiguration {MaxDepth = _settings.MaxQueryDepth};
-                if (_settings.EnableMetrics)
-                {
-                    _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
-                }
+                //if (_settings.EnableMetrics)
+                //{
+                //    _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
+                //}
 
                 _.Listeners.Add(_dataLoaderDocumentListener);
             });
 
-            if (_settings.EnableMetrics)
-            {
-                result.EnrichWithApolloTracing(start);
-            }
+            //if (_settings.EnableMetrics)
+            //{
+            //    result.EnrichWithApolloTracing(start);
+            //}
 
             await WriteResponseAsync(context, result);
         }

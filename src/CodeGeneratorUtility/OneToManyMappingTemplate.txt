@@ -1,0 +1,44 @@
+            Field<ListGraphType<{0}Type>, IEnumerable<{0}>>()
+                  .Name("{1}")
+                  .Description("Related {1}")
+                  .ResolveAsync(context =>
+                  {{
+
+                      Func<IEnumerable<CompositeKey>, CancellationToken, Task<ILookup<CompositeKey, {0}>>> batchLoaderLogic = async (ids, cancelToken) =>
+                      {{
+                          var queryFactory = queryFactoryHelper.GetQueryFactory();
+
+                          var query = queryFactory
+                              .Query("{2}");
+
+                          var whereIn = DataLoaderUtility.GetWhereIn(ids);
+
+                          foreach (var (field, fieldIds) in whereIn)
+                          {{
+                              query.WhereIn(field, fieldIds);
+                          }}
+
+                          var result = await query.GetAsync<{0}>();
+
+                          var coll = new List<Tuple<CompositeKey, {0}>>();
+                          foreach (var r in result)
+                          {{
+                              var fkFields = new Dictionary<string, object>()
+                              {{
+                                  {5}
+                              }};
+                              var key = new CompositeKey(fkFields);
+                              coll.Add(new Tuple<CompositeKey, {0}>(key, r));
+                          }}
+
+                          return coll.ToLookup(pair => pair.Item1, pair => pair.Item2, new CompositeKey.MyEqualityComparer());
+                      }};
+
+                      var dataLoader = dataLoaderContextAccessor.Context.GetOrAddCollectionBatchLoader("{3}_{0}", batchLoaderLogic);
+                      var parentFields = new Dictionary<string, object>()
+                      {{
+                          {4}
+                      }};
+                      return dataLoader.LoadAsync(new CompositeKey(parentFields));
+
+                  }});

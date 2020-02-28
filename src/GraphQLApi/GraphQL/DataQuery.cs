@@ -8,6 +8,7 @@ using GraphQLApi.Models;
 using GraphQLApi.Types;
 using GraphQLApi.Types.Custom;
 using GraphQLApi.Types.Custom.Inputs;
+using GraphQL.Authorization;
 
 namespace GraphQLApi.GraphQL
 {
@@ -17,26 +18,29 @@ namespace GraphQLApi.GraphQL
      * This must be done every time the models are updated,
      * or if the logic needs enhancing...
      */
-    public class DataQuery : ObjectGraphType<object>
+     public class DataQuery : ObjectGraphType<object>
     {
         private readonly QueryFactoryHelper _queryFactoryHelper;
 
         public DataQuery(QueryFactoryHelper queryFactoryHelper)
         {
+
+            //this.AuthorizeWith("IsAuthenticatedPolicy");
+
             _queryFactoryHelper = queryFactoryHelper;
 
             Name = "Query";
 
-            InitQuery<CourseType, Course>();
+            InitQuery<CourseType, Course>("Course");
 
-            InitQuery<DepartmentType, Department>();
+            InitQuery<DepartmentType, Department>("Department");
 
-            InitQuery<StudentType, Student>();
+            InitQuery<StudentType, Student>("Student");
 
 
         }
 
-        private void InitQuery<TFieldType, TModelType>() where TFieldType : IGraphType
+        private void InitQuery<TFieldType, TModelType>(string tableName) where TFieldType : IGraphType
         {
             var entityName = typeof(TModelType).Name;
 
@@ -57,7 +61,7 @@ namespace GraphQLApi.GraphQL
 
                     // build query
                     var queryFactory = _queryFactoryHelper.GetQueryFactory();
-                    var query = queryFactory.Query(entityName);
+                    var query = queryFactory.Query(tableName);
 
                     foreach (var filter in filters)
                     {
