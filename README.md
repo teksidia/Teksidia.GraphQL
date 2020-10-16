@@ -6,7 +6,7 @@ The GraphQL standard was created by Facebook and is widely adopted with an activ
 
 # Example GraphQL Queries
 
-The solution includes middleware at e.g. /ui/playground to run GraphQL queries against the API (it's a bit like Swagger on steriods)
+The solution includes middleware at e.g. /ui/playground to run GraphQL queries against the API.
 
 To return the first 5 records:
 
