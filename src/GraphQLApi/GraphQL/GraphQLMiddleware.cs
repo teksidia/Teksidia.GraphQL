@@ -1,12 +1,10 @@
 using System;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.DataLoader;
-using GraphQL.Instrumentation;
 using GraphQL.Types;
 using GraphQL.Validation.Complexity;
 using Microsoft.AspNetCore.Http;
@@ -70,7 +68,6 @@ namespace GraphQLApi.GraphQL
                 _.UserContext = userContext;
                 _.ValidationRules = _settings.ValidationRules;
                 _.EnableMetrics = _settings.EnableMetrics;
-                _.ExposeExceptions = _settings.ExposeExceptions;
                 _.ComplexityConfiguration = new ComplexityConfiguration {MaxDepth = _settings.MaxQueryDepth};
                 //if (_settings.EnableMetrics)
                 //{
