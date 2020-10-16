@@ -8,7 +8,7 @@ namespace GraphQLApi.Types.Custom.Inputs
         public FilterGraphType()
         {
             Name = "Filter";
-            Description = "Allows filtering on a field. `field` is the name (e.g. MmuId) and `value` is the required value.";
+            Description = "Allows filtering on a field. `field` is the name (e.g. PersonId) and `value` is the required value.";
 
             Field(input => input.Field);
             Field(input => input.Op);

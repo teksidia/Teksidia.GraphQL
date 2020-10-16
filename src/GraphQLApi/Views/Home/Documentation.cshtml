@@ -5,12 +5,11 @@
 
   <div class="col-md-10 offset-md-1">
 
-    <h1>CDM API (GraphQL)</h1>
+    <h1>GraphQL API</h1>
 
     <h2>Introduction</h2>
 
-    <p>The <strong>MMU Canonical Data Model</strong> represents a business view of applicants, students, staff, curriculum etc. </p>
-    <p>This API provides upstream systems with access to this data. It is built using the <a href="https://graphql.org" target="_blank">GraphQL</a> standard.
+    <p>This API provides upstream systems with access to data. It is built using the <a href="https://graphql.org" target="_blank">GraphQL</a> standard.
 
       <div class="alert alert-primary" role="alert">
         GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data. GraphQL provides a complete and understandable description of the data in your API, gives clients the power to ask for exactly what they need and nothing more, makes it easier to evolve APIs over time, and enables powerful developer tools.
@@ -18,19 +17,11 @@
 
     </p>
 
-    <h2>Source Code</h2>
-
-    <p>The source code repository for this API is hosted on the <a href="https://dev.azure.com/MMUIntegration/Student%20Journey%20-%20APIs/_git/CdmApi?path=%2FREADME.md&version=GBmaster" target="_blank">MMU Azure DevOps</a> website.</p>
-
-    <p>It is deployed to Azure using the DevOps continuous integration pipelines.</p>
-
-    <p>This API is based upon the <a href="https://github.com/graphql-dotnet/graphql-dotnet" target="_blank" alt="GraphQL for .NET">open source .NET Core version of GraphQL</a>.</p>
+      <p>This API is based upon the <a href="https://github.com/graphql-dotnet/graphql-dotnet" target="_blank" alt="GraphQL for .NET">open source .NET Core version of GraphQL</a>.</p>
 
     <h2>Use of the API</h2>
 
-    <p>The API uses OAUTH2 token authentication. Any client that requires access must be registered the App Registration feature of Azure AD. Any client must call the token endpoint, using the 'client_credentials' grant type, and then authenticate with the API by passing the bearer token in the Authentication header.</p>
-
-    <p>The GraphQL playground allows developers to experiment with GraphQL queries, and it includes full documentation on queries and schema. To <a asp-controller="Home" asp-action="Index">use the Playground</a>, you must copy a valid bearer token into the HTTP HEADERS section at the bottom of the Playground page.</p>
+      <p>The GraphQL playground allows developers to experiment with GraphQL queries, and it includes full documentation on queries and schema. To <a asp-controller="Home" asp-action="Index">use the Playground</a>, you must copy a valid bearer token into the HTTP HEADERS section at the bottom of the Playground page.</p>
 
     <image src="/images/playground.png" alt="GraphQL Playground" width="972px" height="607px"/>
 
