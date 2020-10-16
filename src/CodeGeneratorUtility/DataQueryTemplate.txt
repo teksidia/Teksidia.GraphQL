@@ -41,8 +41,8 @@ namespace GraphQLApi.GraphQL
             FieldAsync<ResultType<TFieldType, TModelType>>(
                 entityName.ToLowerInvariant(),
                 arguments: new QueryArguments(
-                    new QueryArgument<ListGraphType<FilterGraphType>>() {{ Name = "filter", Description = "Filter by any field where field = value" }},
-                    new QueryArgument<StringGraphType>() {{ Name = "orderBy", Description = "The name of the field to order by." }},
+                    new QueryArgument<ListGraphType<FilterGraphType>>() {{ Name = "filter", Description = "Filter by any field using standard operators" }},
+                    new QueryArgument<StringGraphType>() {{ Name = "orderBy", Description = "The name of the field to order by" }},
                     new QueryArgument<NonNullGraphType<IntGraphType>>() {{ Name = "pageSize", Description = "Page size for pagination" }},
                     new QueryArgument<IntGraphType>() {{ Name = "page", Description = "Page for pagination" }}
                 ),
@@ -54,12 +54,27 @@ namespace GraphQLApi.GraphQL
                     var orderBy = context.GetArgument<string>("orderBy");
 
                     // build query
+
                     var queryFactory = _queryFactoryHelper.GetQueryFactory();
                     var query = queryFactory.Query(tableName);
 
-                    foreach (var filter in filters)
+                    foreach (var item in filters)
                     {{
-                        query.Where(filter.Field, filter.Value);
+                        if(!new[] {{ "in", "not in", "notin" }}.Contains(item.Op.ToLower())) 
+                        {{
+                            query.Where(item.Field, item.Op, item.Value);
+                        }}
+
+                        if(item.Op.ToLower() == "in") 
+                        {{
+                            query.WhereIn(item.Field, item.Value.Split(',').Select(_ => _.Trim()));
+                        }}
+
+                        if(new[] {{ "not in", "notin" }}.Contains(item.Op.ToLower())) 
+                        {{
+                            query.WhereNotIn(item.Field, item.Value.Split(',').Select(_ => _.Trim()));
+                        }}
+
                     }}
 
                     if (!string.IsNullOrEmpty(orderBy))

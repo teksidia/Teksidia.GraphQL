@@ -11,6 +11,7 @@ namespace GraphQLApi.Types.Custom.Inputs
             Description = "Allows filtering on a field. `field` is the name (e.g. MmuId) and `value` is the required value.";
 
             Field(input => input.Field);
+            Field(input => input.Op);
             Field(input => input.Value);
         }
     }

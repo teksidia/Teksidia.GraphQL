@@ -40,22 +40,9 @@ namespace GraphQLApi.Types
 
                     Func<IEnumerable<CompositeKey>, CancellationToken, Task<IDictionary<CompositeKey, Course>>> batchLoaderLogic = async (ids, cancelToken) =>
                     {
-                        var queryFactory = queryFactoryHelper.GetQueryFactory();
-
-                        var query = queryFactory
-                            .Query("Course");
-
-                        var whereIn = DataLoaderUtility.GetWhereIn(ids);
-
-                        foreach (var (field, fieldIds) in whereIn)
-                        {
-                            query.WhereIn(field, fieldIds);
-                        }
-
-                        var result = await query.GetAsync<Course>();
-
+                        var aggregatedResults = await ChildQueryHelper.Get<Course>("Course", queryFactoryHelper, ids);
                         var dict = new Dictionary<CompositeKey, Course>(new CompositeKey.MyEqualityComparer());
-                        foreach (var r in result)
+                        foreach (var r in aggregatedResults)
                         {
                             var fkFields = new Dictionary<string, object>()
                                 {
