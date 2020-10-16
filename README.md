@@ -26,7 +26,7 @@ To return the first 5 records:
 }
 ```
 
-#Paging
+# Paging
 
 Use `pageSize` and `page` to use pagination. Note that `pageSize` is mandatory.
 
