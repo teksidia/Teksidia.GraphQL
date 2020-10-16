@@ -2,7 +2,15 @@
 
 The GraphQL standard was created by Facebook and is widely adopted with an active community.
 
+It's quite useful where front-end developers do not want to be held back waiting for the back-end developers to implement an appropriate API endpoint! They can simply construct their own GraphQL API queries to get whatever data they want.
+
 > GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data. GraphQL provides a complete and understandable description of the data in your API, gives clients the power to ask for exactly what they need and nothing more, makes it easier to evolve APIs over time, and enables powerful developer tools.
+
+# About
+
+This is a baseline example, loosely based on a real-world implementation I wrote for use at Manchester Metropolitan University.
+
+It uses Nuget packages from [GraphQL.NET](https://github.com/graphql-dotnet/graphql-dotnet) and [SqlKata](https://sqlkata.com/) and uses hand-crafted entities, persisted to a database using EF Migrations, but actually using Dapper as the lightweight (invisible) ORM.
 
 # Example GraphQL Queries
 
