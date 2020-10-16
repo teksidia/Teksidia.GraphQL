@@ -41,10 +41,11 @@ This can be used with the `totalCount` and `pageInfo` response properties to pro
 A `filter` parameter can be used to filter the results. Note this supports an array of filters, so more than one filter can be used.
 
 ```
-student(filter:[{field:"id",value:"1"}])
+student(filter:[{field:"id", op: "=", value:"1"}])
+student(filter:[{field:"id", op: "in", value:"1,2,3"}])
 ```
 
-Would run the equivalent query of `FROM Student WHERE isStaff = 1`
+Would run the equivalent query of `FROM Student WHERE isStaff = 1` and `FROM Student WHERE isStaff IN (1,2,3)`
 
 # Ordering
 
